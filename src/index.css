@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+.custom-checkbox {
+  appearance: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 10px;
+  border: 1px solid #d8d8d8;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-checkbox:checked {
+  background-color: #ea5959;
+}
+
+.custom-checkbox:checked::before {
+  content: "✓";
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: black;
+  opacity: 0;
+  transform: scale(0);
+  animation: checkmark 0.3s forwards ease-in-out;
+}
+
+@keyframes checkmark {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
