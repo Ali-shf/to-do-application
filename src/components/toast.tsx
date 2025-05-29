@@ -17,7 +17,7 @@ const Toast = ({ message, type }: IToastProps) => {
 
   return (
     <div
-      className={`absolute top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white transition-opacity duration-500 ${bgColor}`}
+      className={`absolute top-5 left-1/2 transform px-6 py-3 rounded-lg shadow-lg text-white transition-opacity duration-500 ${bgColor}`}
     >
       {message}
     </div>

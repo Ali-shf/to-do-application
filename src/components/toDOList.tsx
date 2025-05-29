@@ -3,6 +3,7 @@ import DropDown from "./dropDown";
 import deleteIcon from "../assets/delete.svg";
 import { FiEdit2 } from "react-icons/fi";
 import Toast from "./toast";
+import { CiFileOn } from "react-icons/ci";
 interface ITask {
   id: number;
   text: string;
@@ -76,7 +77,7 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
     } else {
       setShowError(false);
       setToDo("");
-      setToDos([...todos.concat(newTask)]);
+      setToDos([newTask, ...todos]);
       setHasSubmitted(false);
       setToast({ message: "Task added!", type: "add" });
       setTimeout(() => setToast({ message: "", type: null }), 2000);
@@ -146,7 +147,9 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
     setToast({ message: "Task updated!", type: "edit" });
     setTimeout(() => setToast({ message: "", type: null }), 2000);
   }
-
+  const filteredTodos = todos.filter(
+    (todo) => selectedCategory === "All" || todo.category === selectedCategory
+  );
   return (
     <div>
       <form id="to-do" onSubmit={handleSubmit}>
@@ -172,12 +175,14 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
           </button>
         </div>
       </form>
-      {todos
-        .filter(
-          (todo) =>
-            selectedCategory === "All" || todo.category === selectedCategory
-        )
-        .map((todo) => (
+
+      {filteredTodos.length === 0 ? (
+        <div className="absolute flex flex-col gap-3 items-center bottom-1/4 left-1/2">
+          <CiFileOn className="text-[#EA5959] w-15 h-15" />
+          <p>You have no task here</p>
+        </div>
+      ) : (
+        filteredTodos.map((todo) => (
           <div key={todo.id} className="mt-7 flex justify-between">
             <div className="flex items-center gap-5">
               <input
@@ -212,6 +217,7 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
                   {todo.text}
                 </div>
               )}
+
               {todoEditing === todo.id ? (
                 <DropDown
                   category={editingCategory}
@@ -253,7 +259,9 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
               </button>
             </div>
           </div>
-        ))}
+        ))
+      )}
+
       {toast.message && <Toast message={toast.message} type={toast.type} />}
     </div>
   );
