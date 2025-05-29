@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import DropDown from "./dropDown";
 import deleteIcon from "../assets/delete.svg";
 import { FiEdit2 } from "react-icons/fi";
+import Toast from "./toast";
 interface ITask {
   id: number;
   text: string;
@@ -11,6 +12,11 @@ interface ITask {
 
 interface IToDoListProps {
   selectedCategory: string;
+}
+
+interface IToast {
+  message: string;
+  type: "add" | "edit" | "delete" | null;
 }
 
 const ToDOList = ({ selectedCategory }: IToDoListProps) => {
@@ -27,6 +33,10 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
   const [editingCategory, setEditingCategory] = useState<string>("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [dropdownValues, setDropdownValues] = useState("Pick your category");
+  const [toast, setToast] = useState<IToast>({
+    message: "",
+    type: null,
+  });
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const clickedCategory = e.target.value;
     setDropdownValues(clickedCategory);
@@ -68,12 +78,17 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
       setToDo("");
       setToDos([...todos.concat(newTask)]);
       setHasSubmitted(false);
+      setToast({ message: "Task added!", type: "add" });
+      setTimeout(() => setToast({ message: "", type: null }), 2000);
     }
   }
 
   function deleteTodo(id: number) {
     const updatedTodo = [...todos].filter((todo) => todo.id !== id);
     setToDos(updatedTodo);
+
+    setToast({ message: "Task removed!", type: "delete" });
+    setTimeout(() => setToast({ message: "", type: null }), 2000);
   }
 
   function toggleComplete(id: number) {
@@ -81,6 +96,13 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
       if (todo.id === id) {
         todo.completed = !todo.completed;
       }
+      setToast({
+        message: todo.completed
+          ? "Task marked as completed!"
+          : "Task marked as incomplete",
+        type: "edit",
+      });
+      setTimeout(() => setToast({ message: "", type: null }), 2000);
       return todo;
     });
 
@@ -90,6 +112,20 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
   function editTodo(id: number) {
     if (editingText.trim().length < 3) {
       setEditError(true);
+      return;
+    }
+
+    const targetTodo = todos.find((todo) => todo.id === id);
+    if (!targetTodo) return;
+
+    const textChanged = targetTodo.text !== editingText;
+    const categoryChanged = targetTodo.category !== editingCategory;
+    if (!textChanged && !categoryChanged) {
+      setToast({ message: "Nothing changed.", type: "edit" });
+      setTimeout(() => setToast({ message: "", type: null }), 2000);
+      setToDoEditing(null);
+      setEditingText("");
+      setEditingCategory("");
       return;
     }
     setEditError(false);
@@ -107,6 +143,8 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
     setToDoEditing(null);
     setEditingText("");
     setEditingCategory("");
+    setToast({ message: "Task updated!", type: "edit" });
+    setTimeout(() => setToast({ message: "", type: null }), 2000);
   }
 
   return (
@@ -216,6 +254,7 @@ const ToDOList = ({ selectedCategory }: IToDoListProps) => {
             </div>
           </div>
         ))}
+      {toast.message && <Toast message={toast.message} type={toast.type} />}
     </div>
   );
 };
